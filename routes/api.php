@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -14,3 +15,4 @@ Route::get('test', function () {
         'numbers' => [1, 2, 3]
     ]);
 });
+
