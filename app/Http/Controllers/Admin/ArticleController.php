@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Admin\Article\ArticlesListApiResource;
 use App\Models\Article;
 
 class ArticleController extends Controller
@@ -17,8 +18,6 @@ class ArticleController extends Controller
                 $query->select('id', 'first_name', 'last_name');
             }
         ])->get();
-        return response()->json([
-            'data' => $articles
-        ]);
+        return ArticlesListApiResource::collection($articles);
     }
 }

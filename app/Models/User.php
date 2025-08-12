@@ -12,7 +12,6 @@ class User extends Authenticatable
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
-    protected $appends = ['full_name'];
     /**
      * The attributes that are mass assignable.
      *
@@ -52,7 +51,6 @@ class User extends Authenticatable
     {
         return $this->hasMany(Article::class);
     }
-
     public function getFullNameAttribute()
     {
         return $this->first_name . ' ' . $this->last_name;
