@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
@@ -28,7 +29,7 @@ class UserController extends Controller
     public function store(Request $request)
     {
         try {
-            $validator = \Validator::makee($request->all(), [
+            $validator = \Validator::make($request->all(), [
                 'first_name' => ['required', 'string', 'min:1', 'max:255'],
                 'last_name' => ['required', 'string', 'min:1', 'max:255'],
                 'email' => ['required', 'email', 'unique:users,email'],
@@ -45,6 +46,7 @@ class UserController extends Controller
             $inputs['password'] = bcrypt($inputs['password']);
             $user = User::create($inputs);
         } catch (\Throwable $exception) {
+            app()[ExceptionHandler::class]->report($exception);
             return response()->json([
                 'message' => 'Something went wrong'
             ], 500);
