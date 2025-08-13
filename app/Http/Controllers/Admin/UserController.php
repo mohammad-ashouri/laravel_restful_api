@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\Admin\User\UserDetailsApiResource;
 use App\Http\Resources\Admin\User\UsersListApiResource;
 use App\Models\User;
+use App\RestfulApi\ApiResponse;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -48,15 +49,14 @@ class UserController extends Controller
             $user = User::create($inputs);
         } catch (\Throwable $exception) {
             app()[ExceptionHandler::class]->report($exception);
-            return response()->json([
-                'message' => 'Something went wrong'
-            ], 500);
+            return $this->apiResponse(message: 'Something went wrong', status: 500);
         }
+//        return $this->apiResponse(message: 'User created successfully',data:$user);
 
-        return response()->json([
-            'message' => 'User created successfully',
-            'data' => $user
-        ]);
+        $response=new ApiResponse();
+        $response->setMessage('User created successfully');
+        $response->setData($user);
+        return $response->response();
     }
 
     /**
@@ -122,5 +122,14 @@ class UserController extends Controller
         return response()->json([
             'message' => 'User deleted successfully',
         ]);
+    }
+
+    private function apiResponse($message = null, $data = null, $status = 200)
+    {
+        $body = [];
+        !is_null($message) && $body['message'] = $message;
+        !is_null($data) && $body['data'] = $data;
+
+        return response()->json($body, $status);
     }
 }
