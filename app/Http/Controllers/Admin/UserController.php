@@ -53,9 +53,12 @@ class UserController extends Controller
         }
 //        return $this->apiResponse(message: 'User created successfully',data:$user);
 
-        $response=new ApiResponse();
+        $response = new ApiResponse();
         $response->setMessage('User created successfully');
         $response->setData($user);
+        $response->setAppends([
+            'new' => 'appended'
+        ]);
         return $response->response();
     }
 
