@@ -50,10 +50,9 @@ class UserController extends Controller
         }
 
         $result = $this->userService->registerUser($validator->validated());
-        if (!$result['ok']) {
+        if (!$result->ok) {
             return ApiResponse::withMessage('Something went wrong')->withStatus(500)->build()->response();
         }
-
 
         // Internal function
 //        return $this->apiResponse(message: 'User created successfully',data:$user);
@@ -71,7 +70,7 @@ class UserController extends Controller
 //        return (new ApiResponseBuilder())->withMessage('User created successfully')->withData($user)->build()->response();
 
         //Facade
-        return ApiResponse::withMessage('User created successfully')->withData($result['data'])->build()->response();
+        return ApiResponse::withMessage('User created successfully')->withData($result->data)->build()->response();
     }
 
     /**
