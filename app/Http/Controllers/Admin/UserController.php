@@ -8,12 +8,17 @@ use App\Http\Resources\Admin\User\UsersListApiResource;
 use App\Models\User;
 use App\RestfulApi\ApiResponseBuilder;
 use App\RestfulApi\Facades\ApiResponse;
+use App\Services\UserService;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
+    public function __construct(private UserService $userService)
+    {
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -31,27 +36,24 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        try {
-            $validator = \Validator::make($request->all(), [
-                'first_name' => ['required', 'string', 'min:1', 'max:255'],
-                'last_name' => ['required', 'string', 'min:1', 'max:255'],
-                'email' => ['required', 'email', 'unique:users,email'],
-                'password' => ['required', 'string', 'min:8', 'max:255'],
-            ]);
+        $validator = \Validator::make($request->all(), [
+            'first_name' => ['required', 'string', 'min:1', 'max:255'],
+            'last_name' => ['required', 'string', 'min:1', 'max:255'],
+            'email' => ['required', 'email', 'unique:users,email'],
+            'password' => ['required', 'string', 'min:8', 'max:255'],
+        ]);
 
-            if ($validator->fails()) {
-                return response()->json([
-                    'errors' => $validator->errors()
-                ], 422);
-            }
+        if ($validator->fails()) {
+            return response()->json([
+                'errors' => $validator->errors()
+            ], 422);
+        }
 
-            $inputs = $validator->validated();
-            $inputs['password'] = bcrypt($inputs['password']);
-            $user = User::create($inputs);
-        } catch (\Throwable $exception) {
-            app()[ExceptionHandler::class]->report($exception);
+        $result = $this->userService->registerUser($validator->validated());
+        if (!$result['ok']) {
             return ApiResponse::withMessage('Something went wrong')->withStatus(500)->build()->response();
         }
+
 
         // Internal function
 //        return $this->apiResponse(message: 'User created successfully',data:$user);
@@ -69,7 +71,7 @@ class UserController extends Controller
 //        return (new ApiResponseBuilder())->withMessage('User created successfully')->withData($user)->build()->response();
 
         //Facade
-        return ApiResponse::withMessage('User created successfully')->withData($user)->build()->response();
+        return ApiResponse::withMessage('User created successfully')->withData($result['data'])->build()->response();
     }
 
     /**
