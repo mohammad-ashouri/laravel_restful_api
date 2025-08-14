@@ -6,8 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\Admin\User\UserDetailsApiResource;
 use App\Http\Resources\Admin\User\UsersListApiResource;
 use App\Models\User;
-use App\RestfulApi\ApiResponse;
 use App\RestfulApi\ApiResponseBuilder;
+use App\RestfulApi\Facades\ApiResponse;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -50,7 +50,7 @@ class UserController extends Controller
             $user = User::create($inputs);
         } catch (\Throwable $exception) {
             app()[ExceptionHandler::class]->report($exception);
-            return (new ApiResponseBuilder())->withMessage('Something went wrong')->withStatus(500)->build()->response();
+            return ApiResponse::withMessage('Something went wrong')->withStatus(500)->build()->response();
         }
 
         // Internal function
@@ -66,7 +66,10 @@ class UserController extends Controller
 //        return $response->response();
 
         // Builder
-        return (new ApiResponseBuilder())->withMessage('User created successfully')->withData($user)->build()->response();
+//        return (new ApiResponseBuilder())->withMessage('User created successfully')->withData($user)->build()->response();
+
+        //Facade
+        return ApiResponse::withMessage('User created successfully')->withData($user)->build()->response();
     }
 
     /**
